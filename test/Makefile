@@ -2,19 +2,15 @@
 #
 # It works based on CppUTest
 
+## Variables to help building absolute paths
 
-## we don't want to use relative paths, so we set these variables
 MAKEFILE_DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
-# ## Define project directory path
-REPOSITORY_DIR=$(realpath $(MAKEFILE_DIR)..)
+PROJECT_DIR=$(realpath $(MAKEFILE_DIR)..)
 
-PROJECT_DIR=$(REPOSITORY_DIR)
-
-## test folder directory
 TEST_DIR=$(PROJECT_DIR)/test
 
-#where the cpputest library is located
+
 CPPUTEST_HOME=$(TEST_DIR)/cpputest
 
 
@@ -24,6 +20,7 @@ SRC_DIRS=$(PROJECT_DIR)
 
 # project header files path
 INCLUDE_DIRS=$(PROJECT_DIR)
+
 # add this to avoid problems when including cpputest headers on test files
 INCLUDE_DIRS+=$(CPPUTEST_HOME)/include
 
