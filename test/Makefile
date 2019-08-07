@@ -45,11 +45,17 @@ CPPUTEST_CPPFLAGS+=-Wno-error=unused-parameter
 ## what to call the test binary
 TEST_TARGET=test_runner
 
+# Add the library linking to your Makefile
+LD_LIBRARIES += -L$(CPPUTEST_HOME)/lib -lCppUTestExt
+
+#Reduce the excess of prints in the build process
+ifndef SILENCE
+	SILENCE = @
+endif
+
 #run MakefileWorker.mk with the variables defined here
 include $(CPPUTEST_HOME)/build/MakefileWorker.mk
 
-# Add the library linking to your Makefile
-LD_LIBRARIES += -L$(CPPUTEST_HOME)/lib -lCppUTestExt
 
 .PHONY: run
 run: start $(TEST_TARGET)
