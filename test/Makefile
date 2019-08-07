@@ -17,15 +17,30 @@ CPPUTEST_HOME=$(TEST_DIR)/cpputest
 # -------------------- Source files paths ----------------------- 
 # project source files path
 SRC_DIRS=$(PROJECT_DIR)
+SRC_DIRS+=$(PROJECT_DIR)/bugfree/drivers/io
 
 # project header files path
 INCLUDE_DIRS=$(PROJECT_DIR)
+INCLUDE_DIRS+=$(PROJECT_DIR)/Inc
+INCLUDE_DIRS+=$(PROJECT_DIR)/Drivers/STM32F3xx_HAL_Driver/Inc
+INCLUDE_DIRS+=$(PROJECT_DIR)/Drivers/CMSIS/Device/ST/STM32F3xx/Include
+INCLUDE_DIRS+=$(PROJECT_DIR)/Drivers/CMSIS/Include
+
 
 # add this to avoid problems when including cpputest headers on test files
 INCLUDE_DIRS+=$(CPPUTEST_HOME)/include
 
-## specify where the test code is located
+## test source files path
 TEST_SRC_DIRS=$(TEST_DIR)
+TEST_SRC_DIRS+=$(TEST_DIR)/drivers
+
+## mock path
+MOCKS_SRC_DIRS=$(TEST_DIR)/mocks
+MOCKS_SRC_DIRS=$(TEST_DIR)/mocks/drivers
+
+#---------------------- Build flags ------------------
+CPPUTEST_CPPFLAGS+=-DSTM32F302xC
+CPPUTEST_CPPFLAGS+=-Wno-error=unused-parameter
 
 ## what to call the test binary
 TEST_TARGET=test_runner
@@ -33,6 +48,8 @@ TEST_TARGET=test_runner
 #run MakefileWorker.mk with the variables defined here
 include $(CPPUTEST_HOME)/build/MakefileWorker.mk
 
+# Add the library linking to your Makefile
+LD_LIBRARIES += -L$(CPPUTEST_HOME)/lib -lCppUTestExt
 
 .PHONY: run
 run: start $(TEST_TARGET)
