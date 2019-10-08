@@ -33,6 +33,7 @@ INCLUDE_DIRS+=$(CPPUTEST_HOME)/include
 ## test source files path
 TEST_SRC_DIRS=$(TEST_DIR)
 TEST_SRC_DIRS+=$(TEST_DIR)/drivers
+TEST_SRC_DIRS+=$(TEST_DIR)/mocks_tests
 
 ## mock path
 MOCKS_SRC_DIRS=$(TEST_DIR)/mocks
