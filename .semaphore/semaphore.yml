@@ -1,0 +1,30 @@
+version: v1.0
+name: First pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Prepare cpputest
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: check gcc and g++ version
+          commands:
+            - gcc --version
+            - g++ --version
+        - name: init cpputest
+          commands:
+            - git submodule init test/cpputest
+            - git submodule update test/cpputest
+        - name: build cpputest
+          commands:
+            - cd test/cpputest
+            - ls
+            - ./autogen.sh
+            - ./configure
+            - make
+            - cd ../..
+    dependencies: []
