@@ -5,7 +5,7 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Prepare cpputest
+  - name: Prepare gcc and g++
     task:
       prologue:
         commands:
@@ -15,16 +15,19 @@ blocks:
           commands:
             - gcc --version
             - g++ --version
-        - name: init cpputest
+    dependencies: []
+  - name: Build cpputest
+    dependencies:
+      - Prepare gcc and g++
+    task:
+      jobs:
+        - name: Init and build cpputest
           commands:
             - git submodule init test/cpputest
             - git submodule update test/cpputest
-        - name: build cpputest
-          commands:
             - cd test/cpputest
             - ls
             - ./autogen.sh
-            - ./configure
-            - make
-            - cd ../..
-    dependencies: []
+            - ./configute
+            - ./make
+            - pwd
