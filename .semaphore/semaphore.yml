@@ -35,7 +35,7 @@ blocks:
             - make check_paths
             - make flags
             - make debug
-            - make
+            - make -j4
       epilogue:
         always:
           commands:
