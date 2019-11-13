@@ -12,11 +12,11 @@ blocks:
           - checkout
           - gcc --version
           - g++ --version
-          - install-package --update gcc-8 g++-8 lcov
+          - install-package --update gcc-9 g++-9 lcov
           - sudo rm /usr/bin/gcc
           - sudo rm /usr/bin/g++
-          - sudo ln -s /usr/bin/gcc-8 /usr/bin/gcc
-          - sudo ln -s /usr/bin/g++-8 /usr/bin/g++
+          - sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
+          - sudo ln -s /usr/bin/g++-9 /usr/bin/g++
           - gcc --version
           - g++ --version
       jobs:
