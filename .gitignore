@@ -36,3 +36,5 @@ test/test_runner
 test/test_runner\.txt
 
 Debug/
+
+test/objs/
