@@ -36,10 +36,6 @@ blocks:
             - make flags
             - make debug
             - make -j4
-      epilogue:
-        always:
-          commands:
-            - artifact push job --expire-in 2w main.cpp
     dependencies: []
 execution_time_limit:
   minutes: 10
