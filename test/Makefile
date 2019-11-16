@@ -18,6 +18,7 @@ CPPUTEST_HOME=$(TEST_DIR)/cpputest
 # project source files path
 SRC_DIRS=$(PROJECT_DIR)
 SRC_DIRS+=$(PROJECT_DIR)/bugfree/drivers/io
+SRC_DIRS+=$(PROJECT_DIR)/bugfree/utils/log
 
 # project header files path
 INCLUDE_DIRS=$(PROJECT_DIR)
@@ -33,11 +34,13 @@ INCLUDE_DIRS+=$(CPPUTEST_HOME)/include
 ## test source files path
 TEST_SRC_DIRS=$(TEST_DIR)
 TEST_SRC_DIRS+=$(TEST_DIR)/drivers
+TEST_SRC_DIRS+=$(TEST_DIR)/utils
 TEST_SRC_DIRS+=$(TEST_DIR)/mocks_tests
 
 ## mock path
 MOCKS_SRC_DIRS=$(TEST_DIR)/mocks
-MOCKS_SRC_DIRS=$(TEST_DIR)/mocks/drivers
+MOCKS_SRC_DIRS+=$(TEST_DIR)/mocks/drivers
+MOCKS_SRC_DIRS+=$(TEST_DIR)/mocks/utils
 
 #---------------------- Build flags ------------------
 CPPUTEST_CPPFLAGS+=-DSTM32F302xC

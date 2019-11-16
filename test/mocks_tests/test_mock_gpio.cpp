@@ -1,7 +1,9 @@
 #include "CppUTest/TestHarness.h"
 #include <CppUTestExt/MockSupport_c.h>
 
-#include <stm32f3xx_hal_gpio.h>
+extern "C"{
+    #include <stm32f3xx_hal_gpio.h>
+}
 
 TEST_GROUP(mock_gpio){
         GPIO_TypeDef  gpio;
