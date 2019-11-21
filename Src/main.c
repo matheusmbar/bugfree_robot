@@ -21,6 +21,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
+#include "retcode.h"
+#include "utils/log/log.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -76,7 +78,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  log_init(LOG_DEBUG);
   /* USER CODE END Init */
 
   /* Configure the system clock */

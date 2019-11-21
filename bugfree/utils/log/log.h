@@ -21,9 +21,10 @@ typedef enum {
 retcode_t log_init (loglevel_t level);
 retcode_t log_setLevel (loglevel_t level);
 loglevel_t log_getLevel (void);
-retcode_t log_print (loglevel_t msg_lvl, char * format, ...);
+retcode_t log_print (loglevel_t msg_lvl, const char * format, ...);
 
 retcode_t log_setCallback (log_callback_t func);
 log_callback_t log_getCallback (void);
+void log_setMaxLen (uint16_t length);
 
 #endif

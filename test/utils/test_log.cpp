@@ -7,7 +7,7 @@ extern "C"{
 #include <main.h>
 
 retcode_t mock_print (const char* msg, uint16_t msg_len){
-    printf ("%s", msg);
+    // printf ("\nmsg_len: %d\n%s\n", msg_len, msg);
     return (retcode_t) mock_c()->actualCall("mock_print")
         ->withMemoryBufferParameter("msg", (const unsigned char*)msg, msg_len)
         ->withUnsignedIntParameters("msg_len", msg_len)
@@ -212,7 +212,7 @@ TEST (log_with_init, invalid_callback_function){
 TEST (log_with_init, callback_function_returns_error){
     //log_print function will return RET_RESOURCE_UNAVAILABLE if 
     //callback funtion resturns an error code
-    
+
     mock_c()->expectOneCall("mock_print")
     ->withMemoryBufferParameter("msg", (const unsigned char*) "Hello world", 11)
     ->withUnsignedIntParameters("msg_len", 11)
@@ -229,4 +229,82 @@ TEST (log_with_init, callback_function_returns_error){
 
     ret = log_print (LOG_DEBUG, (char*) "HELLO WORLD");
     CHECK_EQUAL (RET_RESOURCE_UNAVAILABLE, ret);
+}
+
+
+TEST (log_with_init, default_max_msg_len){
+    // default max msg len = 100
+
+    //works with 100 characters
+    char msg_100[] = "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789";
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789", 100)
+    ->withUnsignedIntParameters("msg_len", 100);
+
+    log_print (LOG_DEBUG, "%s", msg_100);
+
+
+    //will crop what is bigger than 100 characters
+    char msg_101[] = "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_";
+
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789", 100)
+    ->withUnsignedIntParameters("msg_len", 100);
+
+    log_print (LOG_DEBUG, "%s", msg_101);
+
+
+    char msg_110[] = "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789";
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789", 100)
+    ->withUnsignedIntParameters("msg_len", 100);
+
+    log_print (LOG_DEBUG, "%s", msg_110);
+}
+
+TEST (log_with_init, init_resets_default_len){
+    log_setMaxLen (20);
+    log_init(LOG_DEBUG);
+    log_setCallback (mock_print);
+
+    char msg_100[] = "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789";
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789", 100)
+    ->withUnsignedIntParameters("msg_len", 100);
+
+    log_print (LOG_DEBUG, "%s", msg_100);
+
+}
+
+TEST (log_with_init, set_max_msg_len){
+
+    log_setMaxLen (20);
+
+    //works with 100 characters
+    char msg_20[] = "_123456789_123456789";
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_", 20)
+    ->withUnsignedIntParameters("msg_len", 20);
+
+    log_print (LOG_DEBUG, "%s", msg_20);
+
+
+    //will crop what is bigger than 20 characters
+    char msg_21[] = "_123456789_123456789_";
+
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_", 20)
+    ->withUnsignedIntParameters("msg_len", 20);
+
+    log_print (LOG_DEBUG, "%s", msg_21);
+
+
+    //will allow msgs bigger than default max len
+    log_setMaxLen (105);
+    char msg_110[] = "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789";
+    mock_c()->expectOneCall("mock_print")
+    ->withMemoryBufferParameter("msg", (const unsigned char*) "_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_1234", 105)
+    ->withUnsignedIntParameters("msg_len", 105);
+
+    log_print (LOG_DEBUG, "%s", msg_110);
 }
