@@ -54,6 +54,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+void uart4_lineIdle (void);
 
 /* USER CODE END EFP */
 

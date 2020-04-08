@@ -12,6 +12,12 @@ typedef enum{
     IO_LED_BLUE, IO_LED_GREEN, IO_LED_RED, IO_LED_YELLOW, 
 }io_dev_t;
 
+typedef enum{
+	IO_LOW,
+	IO_HIGH,
+	IO_ANALOG
+}io_status_t;
+
 /* Function Prototypes--------------------------------------------------------*/
 
 
@@ -20,5 +26,8 @@ void io_setHigh (io_dev_t device);
 
 /* Sets a GPIO pin to LOW level */
 void io_setLow  (io_dev_t device);
+
+/* Gets a GPIO pin level */
+io_status_t io_getLevel (io_dev_t device);
 
 #endif

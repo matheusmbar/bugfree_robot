@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.h
-  * Description        : This file contains all the functions prototypes for 
-  *                      the gpio  
+  * File Name          : dma.h
+  * Description        : This file contains all the function prototypes for
+  *                      the dma.c file
   ******************************************************************************
   * @attention
   *
@@ -16,16 +16,18 @@
   *
   ******************************************************************************
   */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __gpio_H
-#define __gpio_H
+#ifndef __dma_H
+#define __dma_H
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
+/* DMA memory to memory transfer handles -------------------------------------*/
 
 /* USER CODE BEGIN Includes */
 
@@ -35,7 +37,7 @@
 
 /* USER CODE END Private defines */
 
-void MX_GPIO_Init(void);
+void MX_DMA_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -44,11 +46,8 @@ void MX_GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ pinoutConfig_H */
 
-/**
-  * @}
-  */
+#endif /* __dma_H */
 
 /**
   * @}

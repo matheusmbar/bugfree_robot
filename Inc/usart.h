@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.h
-  * Description        : This file contains all the functions prototypes for 
-  *                      the gpio  
+  * File Name          : USART.h
+  * Description        : This file provides code for the configuration
+  *                      of the USART instances.
   ******************************************************************************
   * @attention
   *
@@ -16,10 +16,9 @@
   *
   ******************************************************************************
   */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __gpio_H
-#define __gpio_H
+#ifndef __usart_H
+#define __usart_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -31,11 +30,17 @@
 
 /* USER CODE END Includes */
 
+extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart5;
+
 /* USER CODE BEGIN Private defines */
+extern DMA_HandleTypeDef hdma_uart4_rx;
+extern DMA_HandleTypeDef hdma_uart4_tx;
 
 /* USER CODE END Private defines */
 
-void MX_GPIO_Init(void);
+void MX_UART4_Init(void);
+void MX_UART5_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -44,7 +49,7 @@ void MX_GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ pinoutConfig_H */
+#endif /*__ usart_H */
 
 /**
   * @}
