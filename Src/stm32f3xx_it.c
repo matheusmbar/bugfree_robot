@@ -61,7 +61,7 @@ extern DMA_HandleTypeDef hdma_uart4_rx;
 extern DMA_HandleTypeDef hdma_uart4_tx;
 extern UART_HandleTypeDef huart4;
 /* USER CODE BEGIN EV */
-
+uart_buffer_t buff_u4;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -184,7 +184,7 @@ void UART4_IRQHandler(void)
   if (__HAL_UART_GET_IT(&huart4, UART_IT_IDLE)){
 	  //clear interrupt flag
 	  __HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_IDLEF);
-	  uartDriver_lineIdle4();
+	  uartDriver_lineIdle(&buff_u4, huart4.hdmarx->Instance->CNDTR);
   }
   //else{
   /* USER CODE END UART4_IRQn 0 */

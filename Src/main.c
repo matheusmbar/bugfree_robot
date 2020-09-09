@@ -51,6 +51,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uart_buffer_t buff_u4;
+
 int counter = 0;
 
 //RX buffer must be bigger than bigger message length expected to receive
@@ -111,40 +113,85 @@ int main(void)
   MX_UART4_Init();
   MX_UART5_Init();
   /* USER CODE BEGIN 2 */
+
   log_init(LOG_DEBUG);
-  uartDriver_init();
+
+
+  //setup uart driver parameters and call Init
+  buff_u4.buffer_size = 180;
+  uint8_t buffer_u4_rx[buff_u4.buffer_size];
+  buff_u4.buffer = buffer_u4_rx;
+  buff_u4.huart = &huart4;
+  uartDriver_init(&buff_u4);
+
+  for (uint16_t i = 0; i < buff_u4.buffer_size; i++){
+      buffer_u4_rx[i]= '*';
+  }
+
+  HAL_Delay(500);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    uint8_t msg[100];
+    uint8_t msg[200];
     uint8_t len;
 
-    uart_buffer_t buff_u4;
+
+    uint16_t last_bytes_used = 1;
+    uint16_t bytes_used = 0;
+
 
     while (1) {
         //testing SWO debug print through ST-Link
-        printf("teste %d\n", counter);
+//        printf("teste %d\n", counter);
 
-        uartDriver_getAvailable(&buff_u4);
-        len = snprintf((char*) msg, 100, "\r\nUart buffer\r\n\nHead %d\n\rTail %d\n\rbytes_available %u\r\n\n",
-                (int)buff_u4.head_pos, (int)buff_u4.tail_pos, buff_u4.bytes_available);
-        len = len > 100 ? 100 : len;
-        HAL_UART_Transmit_DMA(&huart4, msg, len);
-        HAL_Delay(100);
+        bytes_used = buff_u4.buffer_size - buff_u4.bytes_available;
+        if (bytes_used != last_bytes_used){
+            last_bytes_used = bytes_used;
 
-        HAL_UART_Transmit_DMA(&huart4, buff_u4.buffer, buff_u4.buffer_size);
-        HAL_Delay(400);
 
-        uint16_t bytes_used = buff_u4.buffer_size - buff_u4.bytes_available;
-        if ((counter%4 == 0) && (bytes_used > 10)){
+            len = snprintf((char*) msg, 100, "\r\nUart buffer\r\n\nHead %d\n\rTail %d\n\rbytes_available %u\n\rbytes_used %u\r\n\n",
+                            (int)buff_u4.head_pos, (int)buff_u4.tail_pos, buff_u4.bytes_available, bytes_used);
+            len = len > 100 ? 100 : len;
 
-            uartDriver_free(buff_u4.buffer_size - buff_u4.bytes_available);
-            len = snprintf((char*) msg, 100, "\t\tFREE %d bytes\r\n", bytes_used);
+            //print buffer contents
             HAL_UART_Transmit(&huart4, msg, len, HAL_MAX_DELAY);
+            HAL_UART_Transmit(&huart4, buff_u4.buffer, buff_u4.buffer_size, HAL_MAX_DELAY);
+            HAL_UART_Transmit(&huart4, (uint8_t*)"\r\n", 2, HAL_MAX_DELAY);
+
+            //print header and tail positions right under buffer contents
+            for (uint8_t i = 0; i < buff_u4.buffer_size; i++){
+                uint8_t c = '_';
+                if (i == buff_u4.head_pos){
+                    if(buff_u4.head_pos == buff_u4.tail_pos){
+                        c = 'x';
+                    }
+                    else{
+                        c = 'H';
+                    }
+                }
+                else if (i == buff_u4.tail_pos){
+                    c = 'T';
+                }
+
+                HAL_UART_Transmit(&huart4, &c, 1, HAL_MAX_DELAY);
+            }
+
+            //deal with buffer content if it has more than 40 bytes
+            if (bytes_used > 40){
+                uartDriver_free(&buff_u4, bytes_used);
+                len = snprintf((char*) msg, 100, "\t\tFREE %d bytes", bytes_used);
+                HAL_UART_Transmit(&huart4, msg, len, HAL_MAX_DELAY);
+            }
+            HAL_UART_Transmit(&huart4, (uint8_t*)"\r\n", 2, HAL_MAX_DELAY);
+
+            counter ++;
+            HAL_Delay(100);
         }
 
-        counter ++;
+
+//        HAL_Delay(500);
 
 
     /* USER CODE END WHILE */
