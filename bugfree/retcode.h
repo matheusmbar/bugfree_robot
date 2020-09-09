@@ -1,6 +1,7 @@
 #ifndef RETCODE_H
 #define RETCODE_H
 
+#include "stdint.h"
 
 typedef enum {
     RET_OK,

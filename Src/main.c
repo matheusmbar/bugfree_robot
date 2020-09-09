@@ -29,6 +29,8 @@
 #include "bugfree/utils/log/log.h"
 #include "bugfree/drivers/io/io.h"
 #include <strings.h>
+#include <stdio.h>
+#include "uart_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,14 +51,17 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+int counter = 0;
+
 //RX buffer must be bigger than bigger message length expected to receive
 //its size must consider the relation between the speed that data is received
 //and the time it takes to process this data
-#define RX_BUFFER_LEN	(100)
-uint8_t rx_buffer[RX_BUFFER_LEN];
-uint8_t idle_line_counter = 0;
-uint32_t bytes_received = 0;
-uint8_t same_pos_counter = 0;
+
+
+int __io_putchar(int ch){
+   ITM_SendChar(ch);
+   return(ch);
+}
 
 /* USER CODE END PV */
 
@@ -71,63 +76,6 @@ void SystemClock_Config(void);
 
 void uart_proccess_data (uint8_t* rx_start, uint8_t len){
     HAL_UART_Transmit(&huart4, rx_start, len, HAL_MAX_DELAY);
-}
-
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
-	if (io_getLevel(IO_LED_GREEN) == IO_HIGH){
-		io_setLow(IO_LED_GREEN);
-	}
-	else{
-		io_setHigh(IO_LED_GREEN);
-	}
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	if (io_getLevel(IO_LED_RED) == IO_HIGH){
-		io_setLow(IO_LED_RED);
-	}
-	else{
-		io_setHigh(IO_LED_RED);
-	}
-}
-
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
-	if (io_getLevel(IO_LED_BLUE) == IO_HIGH){
-		io_setLow(IO_LED_BLUE);
-	}
-	else{
-		io_setHigh(IO_LED_BLUE);
-	}
-}
-
-void uart4_lineIdle (void){
-	static uint32_t old_pos = 0;
-
-	uint32_t pos = RX_BUFFER_LEN - huart4.hdmarx->Instance->CNDTR;
-
-	if (pos == old_pos){
-		same_pos_counter ++;
-		return;
-	}
-	idle_line_counter ++;
-
-	if (pos > old_pos){
-		bytes_received = pos - old_pos;
-		uart_proccess_data(&rx_buffer[old_pos], bytes_received);
-	}
-	else{
-		bytes_received = RX_BUFFER_LEN - old_pos + pos;
-        uart_proccess_data(&rx_buffer[old_pos], RX_BUFFER_LEN - old_pos);
-        uart_proccess_data(&rx_buffer[0], pos);
-	}
-	old_pos = pos;
-
-	if (io_getLevel(IO_LED_YELLOW) == IO_HIGH){
-		io_setLow(IO_LED_YELLOW);
-	}
-	else{
-		io_setHigh(IO_LED_YELLOW);
-	}
 }
 
 /* USER CODE END 0 */
@@ -148,7 +96,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  log_init(LOG_DEBUG);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -164,30 +111,42 @@ int main(void)
   MX_UART4_Init();
   MX_UART5_Init();
   /* USER CODE BEGIN 2 */
-
-  __HAL_UART_ENABLE_IT(&huart4, UART_IT_IDLE);
+  log_init(LOG_DEBUG);
+  uartDriver_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    uint8_t msg[30];
+    uint8_t msg[100];
     uint8_t len;
-    uint8_t counter = 0;
 
+    uart_buffer_t buff_u4;
 
-    HAL_UART_Receive_DMA(&huart4, rx_buffer, RX_BUFFER_LEN);
-
-    uint8_t last_idle_line_counter = 0;
     while (1) {
-//        if (last_idle_line_counter != idle_line_counter) {
-//            last_idle_line_counter = idle_line_counter;
-//            len = snprintf(msg, 30, "Hello world\t%d\t%d\t%lu\t%d\r\n", counter, idle_line_counter, bytes_received, same_pos_counter);
-//            len = len > 30 ? 30 : len;
-//            HAL_UART_Transmit_DMA(&huart4, msg, len);
-//            counter++;
-//        }
+        //testing SWO debug print through ST-Link
+        printf("teste %d\n", counter);
 
-//	 HAL_UART_Receive(&huart4, rx_buffer, 1, 500);
+        uartDriver_getAvailable(&buff_u4);
+        len = snprintf((char*) msg, 100, "\r\nUart buffer\r\n\nHead %d\n\rTail %d\n\rbytes_available %u\r\n\n",
+                (int)buff_u4.head_pos, (int)buff_u4.tail_pos, buff_u4.bytes_available);
+        len = len > 100 ? 100 : len;
+        HAL_UART_Transmit_DMA(&huart4, msg, len);
+        HAL_Delay(100);
+
+        HAL_UART_Transmit_DMA(&huart4, buff_u4.buffer, buff_u4.buffer_size);
+        HAL_Delay(400);
+
+        uint16_t bytes_used = buff_u4.buffer_size - buff_u4.bytes_available;
+        if ((counter%4 == 0) && (bytes_used > 10)){
+
+            uartDriver_free(buff_u4.buffer_size - buff_u4.bytes_available);
+            len = snprintf((char*) msg, 100, "\t\tFREE %d bytes\r\n", bytes_used);
+            HAL_UART_Transmit(&huart4, msg, len, HAL_MAX_DELAY);
+        }
+
+        counter ++;
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

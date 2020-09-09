@@ -23,6 +23,7 @@
 #include "stm32f3xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "uart_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -183,7 +184,7 @@ void UART4_IRQHandler(void)
   if (__HAL_UART_GET_IT(&huart4, UART_IT_IDLE)){
 	  //clear interrupt flag
 	  __HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_IDLEF);
-	  uart4_lineIdle();
+	  uartDriver_lineIdle4();
   }
   //else{
   /* USER CODE END UART4_IRQn 0 */
