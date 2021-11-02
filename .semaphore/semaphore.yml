@@ -12,7 +12,7 @@ blocks:
           - checkout
           - gcc --version
           - g++ --version
-          - install-package --update gcc-8 g++-8 lcov
+          - install-package --update gcc-8 g++-8 lcov gcc-8-multilib g++-8-multilib
           - sudo rm /usr/bin/gcc
           - sudo rm /usr/bin/g++
           - sudo ln -s /usr/bin/gcc-8 /usr/bin/gcc
@@ -27,7 +27,7 @@ blocks:
             - cd test/cpputest
             - ls
             - ./autogen.sh
-            - ./configure
+            - ./configure "CFLAGS=-mx32" "CXXFLAGS=-mx32" "LDFLAGS=-mx32"
             - make -j4
             - cd ../..
             - cd test
