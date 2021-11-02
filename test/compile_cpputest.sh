@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # Execute this script typing
 #    bash compule_cpputest.sh
@@ -11,9 +12,11 @@
 
 #commands to compile cpputest
 cd cpputest
+autoreconf -fi
 ./autogen.sh
-./configure
-make
+#./configure
+./configure "CFLAGS=-mx32" "CXXFLAGS=-mx32" "LDFLAGS=-mx32"
+make -j4
 cd ..
 
 echo -e "\n\nCpputest build finished\n\n"
