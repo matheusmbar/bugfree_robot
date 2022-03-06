@@ -15,7 +15,8 @@ cd cpputest
 autoreconf -fi
 ./autogen.sh
 #./configure
-./configure "CFLAGS=-mx32" "CXXFLAGS=-mx32" "LDFLAGS=-mx32"
+#./configure "CFLAGS=-mx32" "CXXFLAGS=-mx32" "LDFLAGS=-mx32"
+./configure "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
 make -j4
 cd ..
 

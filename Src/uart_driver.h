@@ -17,7 +17,7 @@ typedef struct {
     uint8_t  head_pos;
     uint8_t  tail_pos;
     uint16_t buffer_size;
-    uint16_t bytes_available;
+    uint16_t bytes_received;
 
     uint8_t  last_pos;
 }uart_buffer_t;
@@ -26,8 +26,10 @@ retcode_t uartDriver_init(uart_buffer_t * uart_buffer);
 
 void uartDriver_lineIdle(uart_buffer_t * buffer, uint32_t dma_pos);
 
-uint16_t uartDriver_getAvailable(uart_buffer_t * buffer);
+uint16_t uartDriver_getFreeBytes(uart_buffer_t * buffer);
 
 void uartDriver_free (uart_buffer_t * uart_buffer, uint16_t bytes_to_free);
+
+uint16_t uartDriver_getAvailableRX(uart_buffer_t * buffer);
 
 #endif /* UART_DRIVER_H_ */

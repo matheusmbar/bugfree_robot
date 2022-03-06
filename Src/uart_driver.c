@@ -12,16 +12,12 @@
 // Private variables and defines
 
 #define RX_BUFFER_LEN   (50)
-//uint8_t rx_buffer[RX_BUFFER_LEN];
 uint8_t idle_line_counter = 0;
 uint8_t same_pos_counter = 0;
 
-//uint16_t tail;
-//uint16_t head;
-//uint16_t bytes_available;
 
 // Private function prototypes
-inline void uartDriver_updateAvailable (uart_buffer_t * buffer);
+inline void uartDriver_updateReceived (uart_buffer_t * buffer);
 
 // HAL UART IRQ Callbacks
 
@@ -58,14 +54,10 @@ retcode_t uartDriver_init(uart_buffer_t * buffer){
     buffer->tail_pos = 0;
     buffer->tail_pos = 0;
     buffer->last_pos = 0;
-//    tail = 0;
-//    head = 0;
 
     __HAL_UART_ENABLE_IT(buffer->huart, UART_IT_IDLE);
     HAL_UART_Receive_DMA(buffer->huart, buffer->buffer, buffer->buffer_size);
-//    __HAL_UART_ENABLE_IT(&huart4, UART_IT_IDLE);
-//    HAL_UART_Receive_DMA(&huart4, uart_buffer->buffer, RX_BUFFER_LEN);
-    uartDriver_updateAvailable(buffer);
+    uartDriver_updateReceived(buffer);
     return RET_OK;
 }
 
@@ -77,33 +69,37 @@ void uartDriver_lineIdle(uart_buffer_t * buffer, uint32_t dma_pos){
     }
 
     buffer->head_pos = pos;
-    uartDriver_updateAvailable(buffer);
+    uartDriver_updateReceived(buffer);
 }
 
-uint16_t uartDriver_getAvailable(uart_buffer_t * buffer){
-    return buffer->bytes_available;
+uint16_t uartDriver_getFreeBytes(uart_buffer_t * buffer){
+    return buffer->buffer_size - buffer->bytes_received;
+}
+
+uint16_t uartDriver_getAvailableRX(uart_buffer_t * buffer){
+    return buffer->bytes_received;
 }
 
 void uartDriver_free (uart_buffer_t * buffer, uint16_t bytes_to_free){
-    if (bytes_to_free >= buffer->bytes_available){
+    if (bytes_to_free >= buffer->bytes_received){
         buffer->tail_pos = buffer->head_pos;
     }
     else{
         buffer->tail_pos = (buffer->tail_pos + bytes_to_free) % buffer->buffer_size;
     }
-    uartDriver_updateAvailable(buffer);
+    uartDriver_updateReceived(buffer);
 }
 
 // Private functions
-void uartDriver_updateAvailable (uart_buffer_t * buffer){
-    if (buffer->head_pos < buffer->tail_pos){
-        buffer->bytes_available = buffer->tail_pos - buffer->head_pos;
+void uartDriver_updateReceived (uart_buffer_t * buffer){
+    if (buffer->tail_pos < buffer->head_pos){
+        buffer->bytes_received = buffer->head_pos - buffer->tail_pos;
     }
-    else if (buffer->tail_pos < buffer->head_pos){
-        buffer->bytes_available = buffer->buffer_size - buffer->head_pos + buffer->tail_pos;
+    else if (buffer->head_pos < buffer->tail_pos){
+        buffer->bytes_received = buffer->buffer_size - buffer->head_pos + buffer->tail_pos;
     }
     else{
-        buffer->bytes_available = buffer->buffer_size;
+        buffer->bytes_received = 0;
     }
 }
 
