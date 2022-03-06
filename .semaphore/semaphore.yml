@@ -12,7 +12,7 @@ blocks:
           - checkout
           - gcc --version
           - g++ --version
-          - install-package --update gcc-8 g++-8 lcov
+          - install-package --update gcc-8 g++-8 lcov gcc-8-multilib g++-8-multilib
           - sudo rm /usr/bin/gcc
           - sudo rm /usr/bin/g++
           - sudo ln -s /usr/bin/gcc-8 /usr/bin/gcc
@@ -24,13 +24,15 @@ blocks:
           commands:
             - git submodule init test/cpputest
             - git submodule update test/cpputest
-            - cd test/cpputest
-            - ls
-            - ./autogen.sh
-            - ./configure
-            - make -j4
-            - cd ../..
+            # - cd test/cpputest
+            # - ls
+            # - ./autogen.sh
+            # - ./configure "CFLAGS=-mx32" "CXXFLAGS=-mx32" "LDFLAGS=-mx32"
+            # - make -j4
             - cd test
+            - ./compile_cpputest.sh
+            # - cd ../..
+            # - cd test
             - make clean
             - make check_paths
             - make flags

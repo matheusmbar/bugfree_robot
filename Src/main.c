@@ -138,21 +138,24 @@ int main(void)
     uint8_t len;
 
 
-    uint16_t last_bytes_used = 1;
-    uint16_t bytes_used = 0;
+    uint16_t last_bytes_received = 1;
+    uint16_t bytes_received = 0;
+    uint16_t bytes_free = 0;
 
 
     while (1) {
         //testing SWO debug print through ST-Link
 //        printf("teste %d\n", counter);
 
-        bytes_used = buff_u4.buffer_size - buff_u4.bytes_available;
-        if (bytes_used != last_bytes_used){
-            last_bytes_used = bytes_used;
+        bytes_received = uartDriver_getAvailableRX(&buff_u4);
+
+        if (bytes_received != last_bytes_received){
+            bytes_free = uartDriver_getFreeBytes(&buff_u4);
+            last_bytes_received = bytes_received;
 
 
-            len = snprintf((char*) msg, 100, "\r\nUart buffer\r\n\nHead %d\n\rTail %d\n\rbytes_available %u\n\rbytes_used %u\r\n\n",
-                            (int)buff_u4.head_pos, (int)buff_u4.tail_pos, buff_u4.bytes_available, bytes_used);
+            len = snprintf((char*) msg, 100, "\r\nUart buffer\r\n\nHead %d\n\rTail %d\n\rbytes_received %u\n\rbytes_used %u\r\n\n",
+                            (int)buff_u4.head_pos, (int)buff_u4.tail_pos, bytes_received, bytes_free);
             len = len > 100 ? 100 : len;
 
             //print buffer contents
@@ -179,9 +182,9 @@ int main(void)
             }
 
             //deal with buffer content if it has more than 40 bytes
-            if (bytes_used > 40){
-                uartDriver_free(&buff_u4, bytes_used);
-                len = snprintf((char*) msg, 100, "\t\tFREE %d bytes", bytes_used);
+            if (bytes_received > 40){
+                uartDriver_free(&buff_u4, bytes_received);
+                len = snprintf((char*) msg, 100, "\t\tFREE %d bytes", bytes_received);
                 HAL_UART_Transmit(&huart4, msg, len, HAL_MAX_DELAY);
             }
             HAL_UART_Transmit(&huart4, (uint8_t*)"\r\n", 2, HAL_MAX_DELAY);
@@ -189,10 +192,6 @@ int main(void)
             counter ++;
             HAL_Delay(100);
         }
-
-
-//        HAL_Delay(500);
-
 
     /* USER CODE END WHILE */
 
@@ -211,7 +210,7 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -223,7 +222,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -270,7 +269,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

@@ -46,6 +46,10 @@ MOCKS_SRC_DIRS+=$(TEST_DIR)/mocks/utils
 CPPUTEST_CPPFLAGS+=-DSTM32F302xC
 CPPUTEST_CPPFLAGS+=-Wno-error=unused-parameter
 
+#build for 32bits architecture
+CPPUTEST_CPPFLAGS+=-m32
+CPPUTEST_LDFLAGS+=-m32
+
 ## what to call the test binary
 TEST_TARGET=test_runner
 
