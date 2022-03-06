@@ -1,4 +1,4 @@
-version: v1.0
+version: v1.1
 name: First pipeline
 agent:
   machine:
@@ -24,15 +24,8 @@ blocks:
           commands:
             - git submodule init test/cpputest
             - git submodule update test/cpputest
-            # - cd test/cpputest
-            # - ls
-            # - ./autogen.sh
-            # - ./configure "CFLAGS=-mx32" "CXXFLAGS=-mx32" "LDFLAGS=-mx32"
-            # - make -j4
             - cd test
             - ./compile_cpputest.sh
-            # - cd ../..
-            # - cd test
             - make clean
             - make check_paths
             - make flags
